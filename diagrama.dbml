@@ -1,0 +1,39 @@
+Table users{
+  id int [pk, increment]
+  name varchar(255)
+  email varchar(255) [unique]
+  password varchar(255)
+  remember_token varchar(255) [null]
+}
+
+// Categorias
+
+Table categories{
+  id int [pk, increment]
+  name varchar(255)
+  type enum('ingreso', 'egreso')
+  }
+
+// Movimientos/Transacciones
+
+Table transactions{
+  id int [pk, increment]
+  user_id int [ref: > users.id]
+  category_id int [ref: > categories.id]
+  type enum('ingreso', 'egreso')
+  amount decimal(10,2)
+  description text [null]
+  image_path varchar(255) [null]
+  transaction_date datetime
+}
+
+// Presupuestos
+Table budgets{
+  id int [pk, increment]
+  user_id int [ref: > users.id]
+  category_id int [ref: > categories.id]
+  assigned_amount decimal(10,2)
+  spend_amount decimal(10,2) [default: 0.00]
+  month varchar(20)
+  year int
+}
