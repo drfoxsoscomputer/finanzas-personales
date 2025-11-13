@@ -5,6 +5,7 @@ namespace App\Filament\Resources\Categories;
 use App\Filament\Resources\Categories\Pages\ManageCategories;
 use App\Models\Category;
 use BackedEnum;
+use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
@@ -14,10 +15,13 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use SebastianBergmann\CodeCoverage\Filter;
 
 class CategoryResource extends Resource
 {
@@ -27,13 +31,20 @@ class CategoryResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'name';
 
+    public static function getModelLabel(): string
+    {
+        return __('Category');
+    }
+
     public static function form(Schema $schema): Schema
     {
         return $schema
             ->components([
                 TextInput::make('name')
+                    ->label(__('Name'))
                     ->required(),
                 Select::make('type')
+                    ->label(__('Type'))
                     ->options(['ingreso' => 'Ingreso', 'egreso' => 'Egreso'])
                     ->required(),
             ]);
@@ -43,15 +54,29 @@ class CategoryResource extends Resource
     {
         return $schema
             ->components([
-                TextEntry::make('name'),
-                TextEntry::make('type')
-                    ->badge(),
-                TextEntry::make('created_at')
-                    ->dateTime()
-                    ->placeholder('-'),
-                TextEntry::make('updated_at')
-                    ->dateTime()
-                    ->placeholder('-'),
+                Section::make('Detalles')
+                    ->schema([
+                        TextEntry::make('name')
+                            ->label('Nombre:')
+                            ->inlineLabel(),
+                        TextEntry::make('type')
+                            ->label('Tipo:')
+                            ->inlineLabel()
+                            ->badge(),
+                    ]),
+                Section::make('Fechas')
+                    ->schema([
+                        TextEntry::make('created_at')
+                            ->label('Creado el:')
+                            ->inlineLabel()
+                            ->dateTime('d F Y')
+                            ->placeholder('-'),
+                        TextEntry::make('updated_at')
+                            ->label('Actualizado el:')
+                            ->inlineLabel()
+                            ->dateTime('d F Y')
+                            ->placeholder('-'),
+                    ]),
             ]);
     }
 
@@ -61,13 +86,18 @@ class CategoryResource extends Resource
             ->recordTitleAttribute('name')
             ->columns([
                 TextColumn::make('name')
+                    ->label(__('Name'))
+                    ->sortable()
                     ->searchable(),
                 TextColumn::make('type')
+                    ->label(__('Type'))
                     ->badge()
                     ->colors([
                         'success' => 'ingreso',
                         'danger' => 'egreso',
-                    ]),
+                    ])
+                    ->sortable()
+                    ->searchable(),
                 TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
@@ -78,7 +108,13 @@ class CategoryResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                //
+                SelectFilter::make('type')
+                    ->label(('Filtrar por tipo'))
+                    ->options([
+                        'ingreso' => 'Ingreso',
+                        'egreso' => 'Egreso',
+                    ])
+                    ->placeholder('Todos los tipos'),
             ])
             ->recordActions([
                 ViewAction::make(),
