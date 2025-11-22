@@ -15,9 +15,9 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
             $table->foreignId('category_id')->constrained('categories')->onDelete('cascade');
-            $table->enum('type', ['ingreso', 'egreso']);
-            $table->decimal('amount', 10, 2);
-            $table->text('description')->nullable();
+            // $table->enum('type', ['ingreso', 'egreso']);
+            $table->decimal('amount', 10, 2)->default(0.00);
+            $table->text('description');
             $table->string('image_path')->nullable();
             $table->date('transaction_date');
             $table->timestamps();
