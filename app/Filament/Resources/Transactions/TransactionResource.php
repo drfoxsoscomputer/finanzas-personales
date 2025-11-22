@@ -71,10 +71,6 @@ class TransactionResource extends Resource
                     ]),
                 Section::make()
                     ->Schema([
-                        Select::make('type')
-                            ->label('Tipo')
-                            ->options(['ingreso' => 'Ingreso', 'egreso' => 'Egreso'])
-                            ->required(),
                         TextInput::make('amount')
                             ->label('Monto')
                             ->placeholder('0.00')
@@ -85,17 +81,15 @@ class TransactionResource extends Resource
                             ->label('Fecha de la transacción')
                             ->required()
                     ])
-                    ->columns(3)
+                    ->columns(2)
                     ->columnSpanFull(),
                 Textarea::make('description')
                     ->label('Descripción')
+                    ->required()
                     ->columnSpanFull(),
                 FileUpload::make('image_path')
                     ->image()
                     ->label('Imagen')
-                    // ->disk('public')
-                    // ->directory('transactions')
-                    // ->visibility('public')
                     ->columnSpanFull(),
             ]);
     }
@@ -108,7 +102,7 @@ class TransactionResource extends Resource
                     ->label('Usuario'),
                 TextEntry::make('category.name')
                     ->label('Categoría'),
-                TextEntry::make('type')
+                TextEntry::make('category.type')
                     ->label('Tipo')
                     ->badge()
                     ->colors([
@@ -160,14 +154,14 @@ class TransactionResource extends Resource
                     ->sortable()
                     ->label('Categoría')
                     ->searchable(),
-                TextColumn::make('type')
-                    ->sortable()
+                TextColumn::make('category.type')
                     ->label('Tipo')
                     ->badge()
                     ->colors([
                         'success' => 'ingreso',
                         'danger' => 'egreso',
-                    ]),
+                    ])
+                    ->sortable(),
                 TextColumn::make('amount')
                     ->label('Monto')
                     ->numeric()
@@ -191,6 +185,7 @@ class TransactionResource extends Resource
             ])
             ->filters([
                 //
+                
             ])
             ->recordActions([
                 ViewAction::make(),
