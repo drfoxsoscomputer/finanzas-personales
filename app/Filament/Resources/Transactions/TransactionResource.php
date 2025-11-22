@@ -185,7 +185,7 @@ class TransactionResource extends Resource
             ])
             ->filters([
                 //
-                
+
             ])
             ->recordActions([
                 ViewAction::make(),

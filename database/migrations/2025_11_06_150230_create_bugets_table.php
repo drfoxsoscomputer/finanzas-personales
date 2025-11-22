@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('bugets', function (Blueprint $table) {
             $table->id();
+            $table->string('title');
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
             $table->foreignId('category_id')->constrained('categories')->onDelete('cascade');
             $table->decimal('assined_amount', 10, 2); // monto asignado
