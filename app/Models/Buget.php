@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class Buget extends Model
 {
     protected $fillable = [
+        'title',
         'user_id',
         'category_id',
         'assined_amount',
@@ -24,5 +25,10 @@ class Buget extends Model
     public function category(): BelongsTo
     {
         return $this->belongsTo(Category::class);
+    }
+
+    public function getAvailableAttribute()
+    {
+        return $this->assined_amount - $this->spend_amount;
     }
 }

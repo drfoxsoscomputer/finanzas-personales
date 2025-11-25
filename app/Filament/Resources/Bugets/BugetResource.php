@@ -5,6 +5,7 @@ namespace App\Filament\Resources\Bugets;
 use App\Filament\Resources\Bugets\Pages\ManageBugets;
 use App\Models\Buget;
 use BackedEnum;
+use Dom\Text;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
@@ -14,6 +15,7 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
@@ -41,6 +43,10 @@ class BugetResource extends Resource
     {
         return $schema
             ->components([
+                TextInput::make('title')
+                    ->label('Descripción')
+                    ->required()
+                    ->maxLength(255),
                 Select::make('user_id')
                     ->label('Usuario')
                     ->placeholder('Seleccione un usuario')
@@ -56,7 +62,6 @@ class BugetResource extends Resource
                     ->createOptionForm([
                         TextInput::make('name')
                             ->label('Nombre')
-
                             ->required(),
                         Select::make('type')
                             ->label('Tipo')
@@ -73,11 +78,9 @@ class BugetResource extends Resource
                     ->numeric()
                     ->disabled()
                     ->default(0.0),
-                // TextInput::make('month')
-                //     ->required(),
                 Select::make('month')
-                ->label('Mes')
-                ->placeholder('Seleccione un mes')
+                    ->label('Mes')
+                    ->placeholder('Seleccione un mes')
                     ->required()
                     ->options([
                         'January' => 'Enero',
@@ -105,20 +108,35 @@ class BugetResource extends Resource
         return $schema
             ->components([
                 TextEntry::make('user.name')
-                    ->label('User'),
+                    ->label('Usuario'),
                 TextEntry::make('category.name')
-                    ->label('Category'),
-                TextEntry::make('assined_amount')
-                    ->numeric(),
-                TextEntry::make('spend_amount')
-                    ->numeric(),
-                TextEntry::make('month'),
+                    ->label('Categoría'),
+                Section::make('Montos')
+                    ->schema([
+                        TextEntry::make('assined_amount')
+                            ->label('Asignado')
+                            ->numeric(),
+                        TextEntry::make('spend_amount')
+                            ->label('Gastado')
+                            ->numeric(),
+                        TextEntry::make('available')
+                            ->label('Disponible')
+                            ->color(fn($record) => $record->available >= 0 ? 'success' : 'danger')
+                            ->numeric(),
+                    ])
+                    ->columns(3)
+                    ->columnSpanFull(),
+                TextEntry::make('month')
+                    ->label('Mes'),
                 TextEntry::make('year')
+                    ->label('Año')
                     ->numeric(),
                 TextEntry::make('created_at')
+                    ->label('Creado el')
                     ->dateTime()
                     ->placeholder('-'),
                 TextEntry::make('updated_at')
+                    ->label('Actualizado el')
                     ->dateTime()
                     ->placeholder('-'),
             ]);
@@ -128,27 +146,52 @@ class BugetResource extends Resource
     {
         return $table
             ->recordTitleAttribute('title')
+            ->defaultSort('id', 'asc')
             ->columns([
                 TextColumn::make('user.name')
+                    ->label('Usuario')
+                    ->sortable()
                     ->searchable(),
                 TextColumn::make('category.name')
+                    ->label('Categoría')
+                    ->searchable(),
+                TextColumn::make('category.type')
+                    ->label('Tipo')
+                    ->badge()
+                    ->colors([
+                        'success' => 'ingreso',
+                        'danger' => 'egreso',
+                    ])
+                    ->sortable()
                     ->searchable(),
                 TextColumn::make('assined_amount')
+                    ->label('Monto Asignado')
                     ->numeric()
                     ->sortable(),
                 TextColumn::make('spend_amount')
+                    ->label('Gastado')
                     ->numeric()
                     ->sortable(),
+                TextColumn::make('available')
+                    ->label('Disponible')
+                    ->numeric()
+                    ->color(fn($record) => $record->available >= 0 ? 'success' : 'danger')
+                    ->sortable(),
                 TextColumn::make('month')
+                    ->label('Mes')
+                    ->sortable()
                     ->searchable(),
                 TextColumn::make('year')
+                    ->label('Año')
                     ->numeric()
                     ->sortable(),
                 TextColumn::make('created_at')
+                    ->label('Creado el')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('updated_at')
+                    ->label('Actualizado el')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),

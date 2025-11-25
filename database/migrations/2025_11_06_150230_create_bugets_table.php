@@ -19,7 +19,7 @@ return new class extends Migration
             $table->decimal('assined_amount', 10, 2); // monto asignado
             $table->decimal('spend_amount', 10, 2)->default(0); // monto gastado
             $table->string('month');
-            $table->integer('year')->default(2025);
+            $table->integer('year');
             $table->timestamps();
         });
     }

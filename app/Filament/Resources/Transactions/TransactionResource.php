@@ -139,6 +139,7 @@ class TransactionResource extends Resource
     {
         return $table
             ->recordTitleAttribute('description')
+            ->defaultSort('transaction_date', 'desc')
             ->columns([
                 TextColumn::make('user.name')
                     ->label('Usuario')
