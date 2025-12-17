@@ -23,6 +23,7 @@ use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 
 class TransactionResource extends Resource
@@ -186,7 +187,21 @@ class TransactionResource extends Resource
             ])
             ->filters([
                 //
-
+                SelectFilter::make('category_type')
+                    ->label('Tipo')
+                    ->options([
+                        'ingreso' => 'Ingreso',
+                        'egreso'  => 'Egreso',
+                    ])
+                    ->placeholder('Todos')
+                    ->native(false)
+                    ->query(function ($query, $state) {
+                        return $state['value']
+                            ? $query->whereHas('category', function ($q) use ($state) {
+                                $q->where('type', $state['value']);
+                            })
+                            : $query;
+                    })
             ])
             ->recordActions([
                 ViewAction::make(),
